@@ -1,6 +1,4 @@
 function sys=mySystem(x)
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%% Dati Predeterminati dal committente
 z=convert.ft_m(20000);              %Quota di volo [m]
@@ -59,12 +57,6 @@ p_sed=15;         % Peso per ogni sedile [kg]
 W_liqu=200+(1.9*n_pax); % Peso dei liquidi a bordo [kg]
 g=9.81;           % Accelerazione di gravità [m/s^2]
 a_frenata=1.6;    % Accelerazione in frenata Tra 1.2 e 1.8 [m/s^2]
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%% Calcolo Preliminare del CD0:
-% b=sqrt(S*lambda);
-% c_aero=S/b;
-% Re_wing=(V_cruise*c_aero)/ni;
 
 
 

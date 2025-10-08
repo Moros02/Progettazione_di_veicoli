@@ -1,30 +1,40 @@
 clear all
 close all
 clc
-run("dati.m");
+run("dati.m")
+%%%CREO UNA STRUCT DA USARE NEL FSOLVE
+vars = whos;
+p = struct();
+for i = 1:length(vars)
+    p.(vars(i).name) = eval(vars(i).name);
+end
+%%%%%%%%%%%%%%%%%55
 global Database
 Database=readtable("dati_velivoli.csv");
 genflag=false;
+%%%%%%%%%% Generazione modelli lineari
 mdl_WMTO=workfunction.linear_regression('seats','W_MTO',genflag,linspace(0,300,200));
 mdl_WOE=workfunction.linear_regression('W_MTO','W_OE',genflag,linspace(0,100000,300));
 mdl_wf=workfunction.linear_regression('W_MTO','W_f',genflag,linspace(0,100000,300));
 mdl_wp=workfunction.linear_regression('W_MTO','W_p',genflag,linspace(0,100000,300));
 
+%%%%%%%%%%%% Predizione del peso
 Q_MTO_1=predict(mdl_WMTO,100);
-disp(['Valore di Q_MTO preso da interpolazione: ',num2str(Q_MTO_1)])
+disp(['Valore di Q_MTO preso da interpolazione: ',num2str(Q_MTO_1)]);
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%   ALLORA ALLORAAAHHH     %%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% Predicto superficie e b (di conseguenza lambda)
 mdl_Sw=workfunction.linear_regression('W_MTO','Sw',genflag,linspace(0,100000,300));
 Sw_1=predict(mdl_Sw,Q_MTO_1);
 disp(['La superficie alare stimata (interpolando la stima del peso) è [m^2]: ',num2str(Sw_1)]);
+%b
 mdl_b=workfunction.linear_regression('W_MTO','b',genflag,linspace(0,100000,300));
 b_1=predict(mdl_b,Q_MTO_1);
+%lambda
 lambda=(b_1^2)/Sw_1;
 disp(['Il valore di allungamento alare è: ',num2str(lambda)]);
 
-
+%%% RISOLVO LE EQUAZIONI UNA VOLTA IN MODO DA AVERE VALORI DI PARTENZA:
 %%%%%%%%%%%%%%STIMA DEL CD0:
 c_aer=Sw_1/b_1;
 Re_wing=(V_cruise*c_aer)/ni;
@@ -37,39 +47,23 @@ L_fuso=(n_pax/n_paxrow)*1.2*1.1;
 S_fuso=6.28*R_fuso*L_fuso;
 Re_fuso=(V_cruise*L_fuso)/ni;
 Cf_fuso=0.455/((log(Re_fuso))^2.58*(1+0.144*M^2)^0.65);
-
 CD0_velivolo=((2*cf_wing*f_spess*f_pres*1.2)+Cf_fuso*(S_fuso/Sw_1))*f_int;
-
-disp(['Il CD0 complessivo del velivolo stimato è: ', num2str(CD0_velivolo)]);
-
 %Si calcola il CL:
 CL=(2*Q_MTO_1)/(rho*(V_cruise^2)*Sw_1);
 E=CL/(CD0_velivolo+(CL^2/(pi*e*lambda)));
-
-%AUTONOMIA--------------------------------------------------------
-%Scrivendo omega=(1-alfa*k);
-omega=1/exp((A*c_s)/(E*V_cruise)); %POTREBBE ESSERE g*c_s
+%Si calcola il CL:
+CL=(2*Q_MTO_1)/(rho*(V_cruise^2)*Sw_1);
+E=CL/(CD0_velivolo+(CL^2/(pi*e*lambda)));
+%EQ1
+omega=1/exp((A*c_s)/(E*V_cruise));
 k=(1-omega)/alfa;
-disp(['Il valore di k di prima iterazione è: ', num2str(k)]);
-%Si trova il peso di carbutante sia k=Q_f/Q_MTO
-Q_f=Q_MTO_1*k;
-disp(['Il peso di carburante in kg di prima iterazione è: ',num2str(Q_f)]);
-%Si scrive ora QMTO/S in funzione di omega:
-
-%Atterraggio----------------------------------------------------
+%EQ2
 QM_S=(X_LA/1.66)*a_frenata*((rhosl*Cl_land)/omega);
-disp(['Il valore di QM/S di prima iterazione è: ',num2str(QM_S)]);
-%Si scrive T0/S:
-
-%Decollo---------------------------------------------------------------
+%EQ3
 T0_S=(QM_S^2)*(1/g)*1.75*(1/(XFR*Cl_toff*X_TO*rhosl));
-disp(['Il valore di T0/S di prima iterazione è: ', num2str(T0_S)]);
-
-%Cruise--------------------------------------------------------------
+%EQ4
 T_S=(1/(psi*zeta))*(0.5*rho*(V_cruise^2)*CD0_velivolo+((Q_MTO_1/Sw_1)^2)./(0.5*rho*(V_cruise^2)*e*pi*lambda));
-disp(['Il valore di T/S di prima iterazione è: ',num2str(T_S)]);
-
-%Equazione stima pesi------------------------------------------------
+%EQ5
 Q=Q_MTO_1;
 S=Sw_1;
 N=n*1.5;   %Sovrastima del fattore di carico? 
@@ -83,15 +77,10 @@ Q_motore=0.2*T0_S*(1/QM_S)*Q;
 Q_fisso=(p_pax+W_liqu+p_sed)*g;
 Q_f=k*Q;
 QM=Q_ala+Q_fus+Q_impennaggi+Q_carrello+Q_impianti+Q_motore+Q_fisso+Q_f;
-disp(['Peso del velivolo da equazione pesi: ',num2str(QM)]);
-
-% run("iterQ.m");
-% Trrr=T0_S*Sw_1;
-% 
-% x0=[Q_MTO_1,Sw_1,k,Trrr,lambda];
-% options = optimoptions('fsolve','Display','iter');
-% f = @(x) mySystem(x);
-% 
-% [x, fval, exitflag, output] = fsolve(@mySystem, x0, options);
-% disp('Solution:');
-% disp(x);
+%%%%% Cerco di risolvere le equazioni utilizzando un Fsolve
+x0=[QM,QM_S,k,T0_S,lambda];
+options = optimoptions('fsolve','Display','iter');
+f = @(x) mySystem(x);
+[x, fval, exitflag, output] = fsolve(@mySystem, x0, options);
+disp('Solution:');
+disp(x);
