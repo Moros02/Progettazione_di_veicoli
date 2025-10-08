@@ -6,7 +6,7 @@ run("risoluzione_definitiva.m")
 qms=linspace(0,10000,200);
 T0_S=(qms.^2)*(1/g)*1.75*(1/(XFR*Cl_toff*X_TO*rhosl)); %con qms=QM_S
 
-%Atterramento
+%Atterramentor
 QM_S=(X_LA/1.66)*a_frenata*((rhosl*Cl_land)/(1-alfa*k));
 
 %Crociera

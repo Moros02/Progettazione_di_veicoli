@@ -86,22 +86,12 @@ QM=Q_ala+Q_fus+Q_impennaggi+Q_carrello+Q_impianti+Q_motore+Q_fisso+Q_f;
 disp(['Peso del velivolo da equazione pesi: ',num2str(QM)]);
 
 % run("iterQ.m");
+Trrr=T0_S*Sw_1;
 
+x0=[Q_MTO_1,Sw_1,k,Trrr,lambda];
+options = optimoptions('fsolve','Display','iter');
+f = @(x) mySystem(x);
 
-
-sys=zeros(5,1);
-%Atterraggio
-f_int=1.2;
-f_pres=1.2;
-L_fuso=(n_pax/n_paxrow)*1.2*1.1;
-R_fuso=sqrt(((n_paxrow*0.9+1.2)/2)^2+0.9^2);
-CD0_velivolo=@(S)((2*0.455/((log((V_cruise*(S/b_1))/ni))^2.58*(1+0.144*M^2)^0.65)...
-    *(1+2*(t_c)+60*(t_c)^4)...
-    *f_pres*1.2)+...
-    (0.455/((log((V_cruise*L_fuso)/ni))^2.58*(1+0.144*M^2)^0.65))*(S_fuso/S))*f_int;
-sys(1)=@(k,Q,S)((X_LA/1.66)*a_frenata*((rhosl*Cl_land)/(1-alfa*k)))-(Q/S); %QM_S
-sys(2)=@(Q,T0,S)((Q/S)^2)*(1/g)*1.75*(1/(XFR*Cl_toff*X_TO*rhosl))-(T0/S);%T0_S
-sys(3)=@(T,S,lambda)(1/(psi*zeta))*(0.5*rho*(V_cruise^2)*CD0_velivolo+((Q/S)^2)./(0.5*rho*(V_cruise^2)*e*pi*lambda));
-sys(4)=@(k)(E/c_s)*V*(log(1/(1-alfa*k)));
-sys(5)=@(Q)(1/7760)*N*(Q^(3/2))*(lambda^(3/2))*sqrt(1/QM_S)+6*(1/QM_S)*Q...
-    +Q_fus+Q_impennaggi+Q_carrello+Q_impianti+Q_motore+Q_fisso+Q_f;
+[x, fval, exitflag, output] = fsolve(@mySystem, x0, options);
+disp('Solution:');
+disp(x);

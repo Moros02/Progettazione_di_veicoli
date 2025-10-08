@@ -87,14 +87,3 @@ disp(['Peso del velivolo da equazione pesi: ',num2str(QM)]);
 
 % run("iterQ.m");
 
-
-sys=zeros(5,1);
-%Atterraggio
-CD0_velivolo=@(S)((2*0.455/((log((V_cruise*(S/b_1))/ni))^2.58*(1+0.144*M^2)^0.65)...
-    *f_spess...
-    *f_pres*1.2)+...
-    Cf_fuso*(S_fuso/S))*f_int;
-sys(1)=@(k,Q,S)((X_LA/1.66)*a_frenata*((rhosl*Cl_land)/(1-alfa*k)))-(Q/S); %QM_S
-sys(2)=@(Q,T0,S)((Q/S)^2)*(1/g)*1.75*(1/(XFR*Cl_toff*X_TO*rhosl))-(T0/S);%T0_S
-sys(3)=@(T,S,lambda)(1/(psi*zeta))*(0.5*rho*(V_cruise^2)*CD0_velivolo+((Q/S)^2)./(0.5*rho*(V_cruise^2)*e*pi*lambda));
-sys(4)=@(k)(E/c_s)*V*(log(1/(1-alfa*k)));
