@@ -31,7 +31,7 @@ t_c=0.14;          %t/c dell'ala [%]
 delta=0.3;        %delta per trasformare rho [kg/m^3]
 n=2.5;            %Fattore di carico dell'ala
 %Aggiuntivi
-E=14;            %Efficienza Cl/Cd
+% E=14;            %Efficienza Cl/Cd
 e=0.95;              %oswald efficiency factor
 
 

@@ -51,9 +51,6 @@ CD0_velivolo=((2*cf_wing*f_spess*f_pres*1.2)+Cf_fuso*(S_fuso/Sw_1))*f_int;
 %Si calcola il CL:
 CL=(2*Q_MTO_1)/(rho*(V_cruise^2)*Sw_1);
 E=CL/(CD0_velivolo+(CL^2/(pi*e*lambda)));
-%Si calcola il CL:
-CL=(2*Q_MTO_1)/(rho*(V_cruise^2)*Sw_1);
-E=CL/(CD0_velivolo+(CL^2/(pi*e*lambda)));
 %EQ1
 omega=1/exp((A*c_s)/(E*V_cruise));
 k=(1-omega)/alfa;
@@ -80,7 +77,7 @@ QM=Q_ala+Q_fus+Q_impennaggi+Q_carrello+Q_impianti+Q_motore+Q_fisso+Q_f;
 %%%%% Cerco di risolvere le equazioni utilizzando un Fsolve
 x0=[QM,QM_S,k,T0_S,lambda];
 options = optimoptions('fsolve','Display','iter');
-f = @(x) mySystem(x);
-[x, fval, exitflag, output] = fsolve(@mySystem, x0, options);
+f = @(x) Equation_Systems(x,p,b_1);
+[x, fval, exitflag, output] = fsolve(f, x0, options);
 disp('Solution:');
 disp(x);
