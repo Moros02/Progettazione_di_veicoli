@@ -39,10 +39,10 @@ e=0.95;              %oswald efficiency factor
 %%%%% Dati del motore
 alfa=0.9;         %percentuale di fuel in crociera [%]
 XFR=0.65;          %Coefficiente spinta motore
-zeta=0.28;         %Manetta [%]
+zeta=0.5;         %Manetta [%]  0.6 forse meglio
 c_s0=(0.9/3600);         %consumo specifico a quota zero[N/N*s] 
 psi=((T/Tsl)^5.256)*((Tsl/T)^1.75); %funzione psi(z)
-c_s=c_s0*psi;     %consumo specifico in quota [kg/N*s]
+c_s=c_s0*psi;     %consumo specifico in quota [N/N*s]
 n_paxrow=4;       %numero di passeggeri per fila
 
 

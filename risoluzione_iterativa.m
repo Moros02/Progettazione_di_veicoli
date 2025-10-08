@@ -75,7 +75,8 @@ Q_fisso=(p_pax+W_liqu+p_sed)*g;
 Q_f=k*Q;
 QM=Q_ala+Q_fus+Q_impennaggi+Q_carrello+Q_impianti+Q_motore+Q_fisso+Q_f;
 %%%%% Cerco di risolvere le equazioni utilizzando un Fsolve
-x0=[QM,QM_S,k,T0_S,lambda];
+% x0=[QM,QM_S,k,T0_S,lambda];
+x0=[391444.5,5504,0.176,2131.2,11.01];
 options = optimoptions('fsolve','Display','iter');
 f = @(x) Equation_Systems(x,p,b_1);
 [x, fval, exitflag, output] = fsolve(f, x0, options);
@@ -85,7 +86,7 @@ disp(x);
 
 
 %%%%%%PLOT DEL MATCHING CHART:
-qms=linspace(0,10000,200);
+qms=linspace(0,10000,1000);
 T0_S=(qms.^2)*(1/g)*1.75*(1/(XFR*Cl_toff*X_TO*rhosl)); %con qms=QM_S
 QM_S=(X_LA/1.66)*a_frenata*((rhosl*Cl_land)/(1-alfa*x(3)));
 T_S=(1/(psi*zeta))*(0.5*rho*(V_cruise^2)*(workfunction.cd0_evaluation(p,(x(1)/x(2)),b_1))+(qms.^2)./(0.5*rho*(V_cruise^2)*e*pi*x(5)));
@@ -103,3 +104,28 @@ title('Matching Chart');
 legend('Decollo T0/S', 'Atterraggio QM/S','Crociera T/S', 'Location', 'northeast');
 grid on;
 grid minor;
+
+CL=(2*x(1))/(rho*(V_cruise^2)*(x(1)/x(2)));
+E=CL/((workfunction.cd0_evaluation(p,(x(1)/x(2)),b_1))+(CL^2/(pi*e*x(5))));
+disp(['Efficienza: ', num2str(E)])
+b=sqrt(x(5)*(x(1)/x(2)));
+
+
+disp(['Il valore di Q è:', num2str(x(1))])
+disp(['Il valore di Q/S è:', num2str(x(2))])
+disp(['Il valore di k è:', num2str(x(3))])
+disp(['Il valore di T/S è:', num2str(x(4))])
+disp(['Il valore di lambda è:', num2str(x(5))])
+
+%%%%%%%%%%% ITERAZIONE PER I VALORI Q, Q/S, k, T/S, lambda %%%%%%%%%%x
+xs=cell(1,5);
+xs{1}=[x(1),x(2),x(3),x(4),x(5)];
+
+for iter=1:length(xs)-1
+x0=xs{iter};
+options = optimoptions('fsolve','Display','iter');
+f = @(x) Equation_Systems(x,p,b_1);
+[xs{iter+1}, fval, exitflag, output] = fsolve(f, x0, options);
+end
+disp('Solution:');
+disp(xs{5});
