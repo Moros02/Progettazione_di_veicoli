@@ -1,0 +1,23 @@
+Codice per interpolare e plottare tutte le regressioni in una tabella:
+
+
+
+columns={'W_f','W_MTO','W_OE','n_engine','Thrust','Tot_Thrust'};
+Yi=cell(1,length(columns));
+xarray=linspace(0,300,200);
+for k = 1:length(columns)
+    Yi{k} = Database.(columns{k});    % extract column
+    mdl = fitlm(X, Yi{k});            % fit linear model
+    %PLOT
+    yarray=predict(mdl, xarray');
+    figure
+    scatter(X,Yi{k},'filled');
+    hold on
+    plot(xarray,yarray)
+    xlabel('Seats');
+    ylabel(columns{k});
+    title(sprintf('Retta di regressione lineare per %s del velivolo', columns{k}))
+    grid on
+    grid minor
+    hold off
+end
