@@ -8,18 +8,19 @@ S=x(1)/x(2);
 sys=zeros(5,1);
 %CDO VELIVOLO
 b=sqrt(x(5)*S);
-c_aer=S/b;
-Re_wing=(p.V_cruise*c_aer)/p.ni;
-cf_wing=0.455/((log(Re_wing))^2.58*(1+0.144*p.M^2)^0.65);
-f_int=1.2;
-f_pres=1.2;
-f_spess=1+2*(p.t_c)+60*(p.t_c)^4;
-R_fuso=sqrt(((p.n_paxrow*0.9+1.2)/2)^2+0.9^2);
-L_fuso=(p.n_pax/p.n_paxrow)*1.2*1.1;
-S_fuso=6.28*R_fuso*L_fuso;
-Re_fuso=(p.V_cruise*L_fuso)/p.ni;
-Cf_fuso=0.455/((log(Re_fuso))^2.58*(1+0.144*p.M^2)^0.65);
-CD0_velivolo=((2*cf_wing*f_spess*f_pres*1.2)+Cf_fuso*(S_fuso/S))*f_int;
+% c_aer=S/b;
+% Re_wing=(p.V_cruise*c_aer)/p.ni;
+% cf_wing=0.455/((log(Re_wing))^2.58*(1+0.144*p.M^2)^0.65);
+% f_int=1.2;
+% f_pres=1.2;
+% f_spess=1+2*(p.t_c)+60*(p.t_c)^4;
+% R_fuso=sqrt(((p.n_paxrow*0.9+1.2)/2)^2+0.9^2);
+% L_fuso=(p.n_pax/p.n_paxrow)*1.2*1.1;
+% S_fuso=6.28*R_fuso*L_fuso;
+% Re_fuso=(p.V_cruise*L_fuso)/p.ni;
+% Cf_fuso=0.455/((log(Re_fuso))^2.58*(1+0.144*p.M^2)^0.65);
+% CD0_velivolo=((2*cf_wing*f_spess*f_pres*1.2)+Cf_fuso*(S_fuso/S))*f_int;
+CD0_velivolo=workfunction.cd0_evaluation(p,(x(1)/x(2)),b);
 
 %EFFICIENZA
 CL=(2*x(1))/(p.rho*(p.V_cruise^2)*S);
