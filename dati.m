@@ -20,7 +20,7 @@ data.T=data.Tsl-0.0065*data.z;     %Temperatura a quota z [K] (siamo in Troposfe
 data.rho=((data.T/data.Tsl)^4.256)*data.rhosl; %Densità in crociera
 data.a=sqrt(data.T/data.Tsl)*data.asl;  %Velocità del suono in crociera
 data.V_cruise=data.M*data.a;       %Velocità di crociera [m/s^2]
-data.ni=2.23e-5;         %Viscosità [m^2/s]
+data.ni=2.44e-5;         %Viscosità [m^2/s]
 
 
 
