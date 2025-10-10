@@ -1,16 +1,16 @@
 function sys=Equation_Systems(x,data)
-%Sia x(1)=Q
-%Sia x(2)=Q/S
-%Sia x(3)=k
-%Sia x(4)=T/S
+%Sia x(1)=Q [kg]
+%Sia x(2)=Q/S [N/m^2]
+%Sia x(3)=k  
+%Sia x(4)=T/S  [N/m^2]
 %Sia x(5)=lambda
-S=x(1)/x(2);
+S=(x(1)*data.g)/x(2);
 sys=zeros(5,1);
 %CDO VELIVOLO
 b=sqrt(x(5)*S);
-CD0_velivolo=workfunction.cd0_evaluation(data,(x(1)/x(2)),b);
+CD0_velivolo=workfunction.cd0_evaluation(data,S,b);
 %EFFICIENZA
-CL=(2*x(1))/(data.rho*(data.V_cruise^2)*S);
+CL=(2*x(1)*data.g)/(data.rho*(data.V_cruise^2)*S);
 E=CL/(CD0_velivolo+(CL^2/(pi*data.e*x(5))));
 %autonomia------------------------------
 sys(1)=(E/data.c_s)*data.V_cruise*log(1/(1-data.alfa*x(3)))-data.A;

@@ -11,7 +11,7 @@ run("dati.m")
 %%%%%%%%%%%%%%%%%55
 global Database
 Database=readtable("dati_velivoli.csv");
-genflag=false;
+genflag=false; %general display flag
 %%%%%%%%%% Generazione modelli lineari
 mdl_WMTO=workfunction.linear_regression('seats','W_MTO',genflag,linspace(0,300,200));
 mdl_WOE=workfunction.linear_regression('W_MTO','W_OE',genflag,linspace(0,100000,300));
@@ -20,7 +20,7 @@ mdl_wp=workfunction.linear_regression('W_MTO','W_p',genflag,linspace(0,100000,30
 
 %%%%%%%%%%%% Predizione del peso
 statistic=struct(); %struttura con i dati dalla statistica
-statistic.Q_MTO=predict(mdl_WMTO,100);
+statistic.Q_MTO=predict(mdl_WMTO,100); % [kg]
 disp(['Valore di Q_MTO preso da interpolazione: ',num2str(statistic.Q_MTO)]);
 
 
@@ -32,30 +32,31 @@ disp(['La superficie alare stimata (interpolando la stima del peso) è [m^2]: ',
 mdl_b=workfunction.linear_regression('W_MTO','b',genflag,linspace(0,100000,300));
 statistic.b=predict(mdl_b,statistic.Q_MTO);
 %lambda
-lambda=(statistic.b^2)/statistic.Sw;
-disp(['Il valore di allungamento alare è: ',num2str(lambda)]);
+statistic.lambda=(statistic.b^2)/statistic.Sw;
+disp(['Il valore di allungamento alare è: ',num2str(statistic.lambda)]);
 
 %%% RISOLVO LE EQUAZIONI UNA VOLTA IN MODO DA AVERE VALORI DI PARTENZA:
 %%%%%%%%%%%%%%STIMA DEL CD0:
-CD0_velivolo=workfunction.cd0_evaluation(data,statistic.Sw,statistic.b);
+statistic.CD0_velivolo=workfunction.cd0_evaluation(data,statistic.Sw,statistic.b);
 %Si calcola il CL:
-CL=(2*statistic.Q_MTO)/(data.rho*(data.V_cruise^2)*statistic.Sw);
-E=CL/(CD0_velivolo+(CL^2/(pi*data.e*lambda)));
+statistic.CL=(2*statistic.Q_MTO*data.g)/(data.rho*(data.V_cruise^2)*statistic.Sw);
+statistic.E=statistic.CL/(statistic.CD0_velivolo+((statistic.CL^2)/(pi*data.e*statistic.lambda)));
 %EQ1
-omega=1/exp((data.A*data.c_s)/(E*data.V_cruise));
-k=(1-omega)/data.alfa;
+omega=1/exp((data.A*data.c_s)/(statistic.E*data.V_cruise));
+statistic.k=(1-omega)/data.alfa;
 %EQ2
-QM_S=(data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/omega);
+statistic.QM_S=(data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/omega);
 %EQ3
-T0_S=(QM_S^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl));
+statistic.T0_S=(statistic.QM_S^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl));
 %EQ4
-T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*CD0_velivolo+((statistic.Q_MTO/statistic.Sw)^2)./(0.5*data.rho*(data.V_cruise^2)*data.e*pi*lambda));
+statistic.T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*statistic.CD0_velivolo+((statistic.QM_S)^2)./(0.5*data.rho*(data.V_cruise^2)*data.e*pi*statistic.lambda));
 %EQ5
-QM=workfunction.weight_eval(data,statistic.Q_MTO,QM_S,T0_S,lambda,k);
+statistic.QM=workfunction.weight_eval(data,statistic.Q_MTO,statistic.QM_S,statistic.T0_S,statistic.lambda,statistic.k);
 %%%%% Cerco di risolvere le equazioni utilizzando un Fsolve
 % x0=[QM,QM_S,k,T0_S,lambda];
-x0=[391444.5,5504,0.176,2131.2,11.01];
-options = optimoptions('fsolve','Display','iter');
+x0=[39144.5,5504,0.176,2131.2,11.01];
+% x0=[statistic.Q_MTO,statistic.QM_S,statistic.k,statistic.T_S,statistic.lambda];
+options = optimoptions('fsolve','Display','final');
 f = @(x) Equation_Systems(x,data);
 [x, fval, exitflag, output] = fsolve(f, x0, options);
 disp('Solution:');
@@ -63,7 +64,7 @@ disp(x);
 
 
 %%%%%%PLOT DEL MATCHING CHART:
-DispMatchingchart=true;
+DispMatchingchart=false;
 if DispMatchingchart
     qms=linspace(0,10000,1000);
     T0_S=(qms.^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl)); %con qms=QM_S
@@ -84,10 +85,10 @@ if DispMatchingchart
     grid minor;
 end
 
-CL=(2*x(1))/(data.rho*(data.V_cruise^2)*(x(1)/x(2)));
-E=CL/((workfunction.cd0_evaluation(data,(x(1)/x(2)),statistic.b))+(CL^2/(pi*data.e*x(5))));
+CL=(2*x(1)*data.g)/(data.rho*(data.V_cruise^2)*(x(1)/x(2)));
+E=CL/((workfunction.cd0_evaluation(data,(x(1)*data.g/x(2)),statistic.b))+(CL^2/(pi*data.e*x(5))));
 disp(['Efficienza: ', num2str(E)])
-b=sqrt(x(5)*(x(1)/x(2)));
+b=sqrt(x(5)*(x(1)*data.g/x(2)));
 
 
 disp(['Il valore di Q è:', num2str(x(1))])
@@ -95,16 +96,25 @@ disp(['Il valore di Q/S è:', num2str(x(2))])
 disp(['Il valore di k è:', num2str(x(3))])
 disp(['Il valore di T/S è:', num2str(x(4))])
 disp(['Il valore di lambda è:', num2str(x(5))])
+disp(['Il valore di Qf è: ', num2str(x(1)*x(3))])
+disp(['Il valore di S è: ', num2str(x(1)*data.g/x(2))])
 
 %%%%%%%%%%% ITERAZIONE PER I VALORI Q, Q/S, k, T/S, lambda %%%%%%%%%%x
 xs=cell(1,5);
 xs{1}=[x(1),x(2),x(3),x(4),x(5)];
 
 for iter=1:length(xs)-1
-x0=xs{iter};
-options = optimoptions('fsolve','Display','iter');
-f = @(x) Equation_Systems(x,data);
-[xs{iter+1}, fval, exitflag, output] = fsolve(f, x0, options);
+    if iter==length(xs)-1
+        x0=xs{iter};
+        options = optimoptions('fsolve','Display','final');
+        f = @(x) Equation_Systems(x,data);
+        [xs{iter+1}, fval, exitflag, output] = fsolve(f, x0, options);
+    else
+        x0=xs{iter};
+        options = optimoptions('fsolve','Display','none');
+        f = @(x) Equation_Systems(x,data);
+        [xs{iter+1}, fval, exitflag, output] = fsolve(f, x0, options);
+    end
 end
 disp('Solution:');
 disp(xs{5});
