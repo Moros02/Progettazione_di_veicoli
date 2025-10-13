@@ -1,7 +1,7 @@
 clear all
 close all
 clc
-run("dati.m")
+run("modRicky_dati.m")
 %%%CREO UNA STRUCT DA USARE NEL FSOLVE
 % vars = whos;
 % p = struct();
@@ -137,6 +137,7 @@ disp(['k          = ', num2str(xs5(3))])
 disp(['T/S [N/m2] = ', num2str(xs5(4))])
 disp(['lambda     = ', num2str(xs5(5))])
 disp('===============================================')
+
 
 
 
