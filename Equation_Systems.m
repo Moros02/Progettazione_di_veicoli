@@ -15,6 +15,8 @@ E=CL/(CD0_velivolo+(CL^2/(pi*data.e*x(5))));
 %autonomia------------------------------
 sys(1)=(E/data.c_s)*data.V_cruise*log(1/(1-data.alfa*x(3)))-data.A;
 %Atterraggio----------------------------------------------------
+data.Cl_land=(2*x(1)*data.g)/(data.rhosl*data.V_LA^2*S);
+
 sys(2)=(data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/(1-data.alfa*x(3)))-x(2); %Q/S
 %Decollo---------------------------------------------------------------
 sys(3)=(x(2)^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl))-x(4); %T/S

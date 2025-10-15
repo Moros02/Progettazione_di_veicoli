@@ -98,6 +98,7 @@ disp(['Il valore di T/S è:', num2str(x(4))])
 disp(['Il valore di lambda è:', num2str(x(5))])
 disp(['Il valore di Qf è: ', num2str(x(1)*x(3))])
 disp(['Il valore di S è: ', num2str(x(1)*data.g/x(2))])
+disp(['Il valore di Cl_land è: ',num2str(data.Cl_land)])
 
 %%%%%%%%%%% ITERAZIONE PER I VALORI Q, Q/S, k, T/S, lambda %%%%%%%%%%x
 xs=cell(1,5);

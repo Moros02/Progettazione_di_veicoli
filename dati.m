@@ -10,7 +10,6 @@ data.A=2.5e6;%sovrastimato %convert.nm_m(1000);           %Autonomia [m]
 data.M=0.7;              %Mach di crociera
 
 
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%Determinazione Dati ambiente
 data.rhosl=1.225;        %Densità a livello del mare [kg/m^3]
@@ -33,7 +32,7 @@ data.delta=0.3;        %delta per trasformare rho [kg/m^3]
 data.n=2.5;            %Fattore di carico dell'ala
 %Aggiuntivi
 % E=14;            %Efficienza Cl/Cd
-data.e=0.6;              %oswald efficiency factor
+data.e=0.8;              %oswald efficiency factor
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
