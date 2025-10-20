@@ -4,10 +4,10 @@ data=struct();
 data.z=convert.ft_m(20000);              %Quota di volo [m]
 data.n_pax=100;        %numero di passeggeri
 data.X_TO=1450;        %Lunghezza di pista in takeoff [m]
-data.X_LA=1411;        %Lunghezza di pista in landing [m]
+data.X_LA=1450;        %Lunghezza di pista in landing [m]
 data.V_LA=convert.kts_ms(115);         %Velocità in atterraggio [m/s]
 data.A=2.5e6;%sovrastimato %convert.nm_m(1000);           %Autonomia [m]
-data.M=0.78;              %Mach di crociera
+data.M=0.75;              %Mach di crociera
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -39,7 +39,7 @@ data.e=0.9;              %oswald efficiency factor
 %%%%% Dati del motore
 data.alfa=0.9;         %percentuale di fuel in crociera [%]
 data.XFR=0.6;          %Coefficiente spinta motore
-data.zeta=0.5;         %Manetta [%]  0.6 forse meglio
+data.zeta=0.38;         %Manetta [%]  0.6 forse meglio
 data.c_s0=(0.9/3600);         %consumo specifico a quota zero[N/N*s] 
 data.psi=((data.T/data.Tsl)^5.256)*((data.Tsl/data.T)^1.75); %funzione psi(z)
 data.c_s=data.c_s0*data.psi;     %consumo specifico in quota [N/N*s]
@@ -49,19 +49,21 @@ data.n_paxrow=4;       %numero di passeggeri per fila
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% Dati predeterminati ulteriori
-data.p_pax=100;         % peso per passeggero [kg]
+data.p_pax=95;         % peso per passeggero [kg]
 data.v_pax=convert.ft3_m3(5);  % Volume per passeggero [m^3]
 data.n_eq=4;           % Membri equipaggio
 data.p_sed=15;         % Peso per ogni sedile [kg]
 data.W_liqu=200+(1.9*data.n_pax); % Peso dei liquidi a bordo [kg]
 data.g=9.81;           % Accelerazione di gravità [m/s^2]
-data.a_frenata=1.7;    % Accelerazione in frenata Tra 1.2 e 1.8 [m/s^2]
+data.a_frenata=1.8;    % Accelerazione in frenata Tra 1.2 e 1.8 [m/s^2]
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%% Calcolo Preliminare del CD0:
 % b=sqrt(S*lambda);
 % c_aero=S/b;
 % Re_wing=(V_cruise*c_aero)/ni;
+
+
 
 
 
