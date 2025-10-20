@@ -1,7 +1,7 @@
 clear all
 close all
 clc
-run("modRicky_dati.m")
+run("modRickystatistica_dati.m")
 %%%CREO UNA STRUCT DA USARE NEL FSOLVE
 % vars = whos;
 % p = struct();
@@ -54,36 +54,17 @@ statistic.T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*statistic
 statistic.QM=workfunction.weight_eval(data,statistic.Q_MTO,statistic.QM_S,statistic.T0_S,statistic.lambda,statistic.k);
 %%%%% Cerco di risolvere le equazioni utilizzando un Fsolve
 % x0=[QM,QM_S,k,T0_S,lambda];
-x0=[39144.5,5504,0.176,2131.2,11.01];
-% x0=[statistic.Q_MTO,statistic.QM_S,statistic.k,statistic.T_S,statistic.lambda];
+%x0=[39144.5,5504,0.176,2131.2,11.01];
+x0=[statistic.QM,statistic.QM_S,statistic.k,statistic.T_S,statistic.lambda];
+format long
+disp('x0 è: ');
+disp(x0);
 options = optimoptions('fsolve','Display','final');
 f = @(x) Equation_Systems(x,data);
 [x, fval, exitflag, output] = fsolve(f, x0, options);
 disp('Solution:');
 disp(x);
 
-
-%%%%%%PLOT DEL MATCHING CHART:
-DispMatchingchart=false;
-if DispMatchingchart
-    qms=linspace(0,10000,1000);
-    T0_S=(qms.^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl)); %con qms=QM_S
-    QM_S=(data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/(1-data.alfa*x(3)));
-    T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*(workfunction.cd0_evaluation(data,(x(1)/x(2)),statistic.b))+(qms.^2)./(0.5*data.rho*(data.V_cruise^2)*data.e*pi*x(5)));
-    figure
-    plot(qms, T0_S, 'b-', 'LineWidth',2);
-    hold on;
-    yl=ylim;
-    plot([QM_S QM_S], [yl(1) yl(2)], 'r-', 'LineWidth', 2);
-    plot(qms, T_S, 'k-', 'LineWidth', 2)
-    hold off;
-    xlabel('QM\_S');
-    ylabel('T0\_S');
-    title('Matching Chart');
-    legend('Decollo T0/S', 'Atterraggio QM/S','Crociera T/S', 'Location', 'northeast');
-    grid on;
-    grid minor;
-end
 
 CL=(2*x(1)*data.g)/(data.rho*(data.V_cruise^2)*(x(1)/x(2)));
 E=CL/((workfunction.cd0_evaluation(data,(x(1)*data.g/x(2)),statistic.b))+(CL^2/(pi*data.e*x(5))));
@@ -98,7 +79,6 @@ disp(['Il valore di T/S è:', num2str(x(4))])
 disp(['Il valore di lambda è:', num2str(x(5))])
 disp(['Il valore di Qf è: ', num2str(x(1)*x(3))])
 disp(['Il valore di S è: ', num2str(x(1)*data.g/x(2))])
-disp(['Il valore di Cl_land è: ',num2str(data.Cl_land)])
 
 %%%%%%%%%%% ITERAZIONE PER I VALORI Q, Q/S, k, T/S, lambda %%%%%%%%%%x
 xs=cell(1,5);
@@ -119,16 +99,18 @@ for iter=1:length(xs)-1
 end
 disp('Solution:');
 disp(xs{5});
-xs5=xs{5};
-xs5(1)=xs5(1)*data.g;
 
 
 %%%%%%PLOT DEL MATCHING CHART:
+
+xs5=xs{5};
+xs5(1)=xs5(1)*data.g;  %converto Q in [N]
+
 DispMatchingchart=true;
 if DispMatchingchart
-    qms=linspace(0,10000,1000);
+    qms=linspace(0,10000,100000);
     T0_S=(qms.^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl)); %con qms=QM_S
-    QM_S=(data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/(1-data.alfa*xs5(3)));
+    QM_S=((data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/(1-data.alfa*xs5(3))));
     T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*(workfunction.cd0_evaluation(data,(xs5(1)/xs5(2)),statistic.b))+(qms.^2)./(0.5*data.rho*(data.V_cruise^2)*data.e*pi*xs5(5)));
     figure
     plot(qms, T0_S, 'b-', 'LineWidth',2);
@@ -136,6 +118,7 @@ if DispMatchingchart
     yl=ylim;
     plot([QM_S QM_S], [yl(1) yl(2)], 'r-', 'LineWidth', 2);
     plot(qms, T_S, 'k-', 'LineWidth', 2)
+    %plot(xs5(2),xs5(4),'gx','LineWidth',2) %punto di progetto
     hold off;
     xlabel('QM\_S');
     ylabel('T0\_S');
@@ -144,6 +127,7 @@ if DispMatchingchart
     grid on;
     grid minor;
 end
+
 
 
 disp('================== RISULTATI ==================')
