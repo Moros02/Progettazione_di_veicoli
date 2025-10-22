@@ -106,11 +106,12 @@ disp(xs{5});
 xs5=xs{5};
 xs5(1)=xs5(1)*data.g;  %converto Q in [N]
 
-DispMatchingchart=true;
+DispMatchingchart=false;
 if DispMatchingchart
     qms=linspace(0,10000,100000);
     T0_S=(qms.^2)*(1/data.g)*1.75*(1/(data.XFR*data.Cl_toff*data.X_TO*data.rhosl)); %con qms=QM_S
     QM_S=((data.X_LA/1.66)*data.a_frenata*((data.rhosl*data.Cl_land)/(1-data.alfa*xs5(3))));
+    %EVENTUALMENTE RICORDARSI CHE LA B STATISTICA NON è QUELLA!!
     T_S=(1/(data.psi*data.zeta))*(0.5*data.rho*(data.V_cruise^2)*(workfunction.cd0_evaluation(data,(xs5(1)/xs5(2)),statistic.b))+(qms.^2)./(0.5*data.rho*(data.V_cruise^2)*data.e*pi*xs5(5)));
     figure
     plot(qms, T0_S, 'b-', 'LineWidth',2);
