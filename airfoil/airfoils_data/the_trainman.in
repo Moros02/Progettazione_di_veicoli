@@ -1,0 +1,12 @@
+LOAD 
+n63012a.dat
+y
+PANE
+OPER
+Visc 25736525
+PACC
+C:\Users\olive\OneDrive\Documenti\Politecnico\Materiale\Secondo_Anno\Progettazione_veicoli_aerospaziali\Progettazione_di_veicoli\airfoil\airfoil_polars\n63012a_polar.txt
+
+ITER 100
+ASeq -4.00 8.00 1.00
+QUIT

@@ -130,7 +130,12 @@ if DispMatchingchart
 end
 
 
-
+Q=xs5(1)/data.g;
+S=xs5(1)/xs5(2);
+Q_S=xs5(2);
+k=xs5(3);
+T_S=xs5(4);
+lambda=xs5(5);
 disp('================== RISULTATI ==================')
 disp(['Q [kg]     = ', num2str(xs5(1)/data.g)])
 disp(['S [m2]     = ', num2str(xs5(1)/xs5(2))])
@@ -138,4 +143,30 @@ disp(['Q/S [N/m2] = ', num2str(xs5(2))])
 disp(['k          = ', num2str(xs5(3))])
 disp(['T/S [N/m2] = ', num2str(xs5(4))])
 disp(['lambda     = ', num2str(xs5(5))])
+disp(['b          = ', num2str(sqrt(lambda*S))])
 disp('===============================================')
+run('payload_rage.m');
+
+
+%valutazione del Reynolds Nell'ala:
+CL=(2*Q*data.g)/(data.rho*(data.V_cruise^2)*S);
+disp(['Il CL di ala è: ',num2str(CL)]);
+b=sqrt(lambda*S);
+c_aer=S/b;
+Re_wing=(data.V_cruise*c_aer)/data.ni;
+
+%Si salvano i dati finali ottenuti dal dimensionamento preliminare:
+dimensionamento_preliminare.Q=Q;
+dimensionamento_preliminare.S=S;
+dimensionamento_preliminare.Q_S=Q_S;
+dimensionamento_preliminare.k=k;
+dimensionamento_preliminare.T_S=T_S;
+dimensionamento_preliminare.lambda=lambda;
+dimensionamento_preliminare.CL=CL;
+dimensionamento_preliminare.b=b;
+dimensionamento_preliminare.c_aer=c_aer;
+dimensionamento_preliminare.Re_wing=Re_wing;
+dimensionamento_preliminare.M=data.M;
+
+save_folder = fullfile(pwd, 'airfoil');
+save(fullfile(save_folder, 'dimensionamentoPreliminare.mat'), 'dimensionamento_preliminare');
